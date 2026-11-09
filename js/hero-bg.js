@@ -107,7 +107,14 @@ export function initHeroBg(canvas, state, reduced) {
     ['orn-wine', -4.0, -1.0, 0.8, 0.3], ['orn-cream', 4.2, 0.9, 1.0, 0.24], ['orn-wine', 5.8, 2.9, -3, 0.42], ['orn-ice', -5.6, 2.8, -3.5, 0.34],
     ['drop', 2.9, 0.6, 3.0, 0.09], ['drop', -2.9, 1.5, 3.2, 0.08], ['drop', 3.8, -2.1, 2.2, 0.12], ['drop', -4.6, 0.3, 1.6, 0.11],
   ];
-  for (const [type, x, y, z, s] of layout) {
+  // układ na telefon (wąski ekran): dekoracje w rogach, nad i pod kubkiem
+  const mobileLayout = [
+    [-1.9, 3.5, 0, 0.45], [2.0, -3.6, 0, 0.5], [-2.0, -2.2, 1, 0.3], [1.8, 2.6, -2, 0.4],
+    [-2.6, 0.6, -3, 0.6], [2.8, 0.2, -4, 0.55], [0.9, -4.2, 1.5, 0.2],
+    [-1.6, -3.9, 0.5, 0.26], [1.9, 1.0, 0.5, 0.2], [2.2, 4.0, -2, 0.3], [-2.3, 4.3, -2.5, 0.26],
+    [1.2, 3.1, 2.5, 0.07], [-1.3, 2.0, 2.5, 0.06], [1.5, -2.6, 2, 0.09], [-1.9, -0.4, 1.5, 0.08],
+  ];
+  layout.forEach(([type, x, y, z, s], i) => {
     let obj;
     if (type === 'flake') obj = new THREE.Mesh(flakeGeo, Math.random() > 0.35 ? iceMat : iceDeepMat);
     else if (type === 'drop') obj = new THREE.Mesh(sphereGeo, chocoMat);
@@ -122,8 +129,11 @@ export function initHeroBg(canvas, state, reduced) {
     obj.scale.setScalar(s);
     obj.rotation.set(Math.random() * 6, Math.random() * 6, Math.random() * 6);
     group.add(obj);
-    items.push({ obj, base: new THREE.Vector3(x, y, z), spin: (Math.random() - 0.5) * 0.6, phase: Math.random() * 6, float: 0.15 + Math.random() * 0.25 });
-  }
+    const m = mobileLayout[i];
+    items.push({ obj, desk: { pos: new THREE.Vector3(x, y, z), s }, mob: { pos: new THREE.Vector3(m[0], m[1], m[2]), s: m[3] }, spin: (Math.random() - 0.5) * 0.6, phase: Math.random() * 6, float: 0.12 + Math.random() * 0.2 });
+  });
+  let isMobile = false;
+  const applyLayout = () => items.forEach((it) => { it.base = isMobile ? it.mob.pos : it.desk.pos; it.obj.scale.setScalar(isMobile ? it.mob.s : it.desk.s); });
 
   // ---------- snow ----------
   const N = reduced ? 0 : 900;
@@ -142,8 +152,10 @@ export function initHeroBg(canvas, state, reduced) {
     const w = canvas.clientWidth, h = canvas.clientHeight;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
-    camera.fov = w / h < 0.8 ? 55 : 38; // telefon: szerszy kadr
+    isMobile = w / h < 0.8;
+    camera.fov = isMobile ? 55 : 38; // telefon: szerszy kadr
     camera.updateProjectionMatrix();
+    applyLayout();
   }
   addEventListener('resize', resize); resize();
 
@@ -169,7 +181,7 @@ export function initHeroBg(canvas, state, reduced) {
     camera.lookAt(0, p * 0.3, 0);
 
     for (const it of items) {
-      const spread = 1 + p * 0.55;
+      const spread = 1 + p * (isMobile ? 0.35 : 0.55);
       it.obj.position.x = it.base.x * spread;
       it.obj.position.y = it.base.y + Math.sin(t * 0.6 + it.phase) * it.float + p * (it.base.y > 0 ? 1.2 : -1.2);
       it.obj.position.z = it.base.z;
