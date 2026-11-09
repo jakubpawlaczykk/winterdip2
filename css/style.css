@@ -2,19 +2,24 @@
    WINTERDIP — premium winter landing
    ========================================================= */
 :root {
-  --bg: #0d0806;
-  --bg-2: #150d0a;
-  --bg-3: #1e1410;
-  --cream: #f4ebdf;
-  --cream-dim: rgba(244, 235, 223, 0.62);
-  --cream-faint: rgba(244, 235, 223, 0.14);
-  --red: #c8161d;
-  --red-deep: #8f0f14;
-  --gold: #e9b872;
-  --gold-soft: rgba(233, 184, 114, 0.18);
-  --line: rgba(244, 235, 223, 0.12);
-  --serif: "Fraunces", "Cormorant Garamond", Georgia, serif;
-  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* paleta z logo Winter Dip */
+  --bg: #1c060b;
+  --bg-2: #25080f;
+  --bg-3: #330c16;
+  --wine: #7a0e1e;
+  --cream: #f6e9d7;
+  --cream-dim: rgba(246, 233, 215, 0.66);
+  --cream-faint: rgba(246, 233, 215, 0.12);
+  --red: #a3172b;
+  --red-deep: #7a0e1e;
+  --gold: #8fd3f4;          /* akcent: lodowy błękit ze śnieżynki */
+  --gold-soft: rgba(143, 211, 244, 0.14);
+  --ice: #8fd3f4;
+  --ice-deep: #2fa6e0;
+  --line: rgba(246, 233, 215, 0.12);
+  --display: "Cherry Bomb One", "Cooper Black", system-ui, sans-serif;
+  --serif: var(--display);
+  --sans: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --radius: 22px;
   --gutter: clamp(16px, 4vw, 56px);
@@ -442,3 +447,53 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* =========================================================
+   BRAND v2 — kolory i fonty z logo Winter Dip
+   ========================================================= */
+::selection { background: var(--wine); color: var(--cream); }
+.display { font-family: var(--display); font-weight: 400; letter-spacing: 0; line-height: 1.04; }
+.display em { font-style: normal; color: var(--ice); }
+.h2 { font-size: clamp(38px, 5.6vw, 84px); }
+.eyebrow { color: var(--ice); }
+.btn { font-family: var(--display); font-weight: 400; font-size: 16px; letter-spacing: .01em; }
+.btn--primary { background: var(--cream); color: var(--wine); box-shadow: 0 12px 40px -14px rgba(246,233,215,.45); }
+.btn--primary::before { background: #fff; }
+.btn--primary:hover { box-shadow: 0 18px 50px -12px rgba(143,211,244,.45); }
+.btn--ghost:hover { color: var(--wine); }
+.announce { background: var(--wine); }
+.badge--red, .pdp__price .save { background: var(--wine); color: var(--cream); }
+.cart-count { background: var(--ice-deep); }
+.logo img { height: 42px; width: auto; display: block; }
+.nav { font-weight: 600; }
+
+/* tekst ciągły w Nunito */
+.r-card p { font-family: var(--sans); font-weight: 600; font-size: 18px; line-height: 1.5; }
+.faq-item summary { font-family: var(--sans); font-weight: 700; font-size: clamp(18px, 1.5vw, 22px); }
+.g-text p { font-family: var(--display); }
+.contact__links a { font-family: var(--display); }
+.p-card__name, .pdp__title { font-weight: 400; }
+.compare thead th { font-family: var(--display); font-weight: 400; }
+.price__now, .pdp__price .now { font-family: var(--display); font-weight: 400; }
+.hero__sub, .lead { font-weight: 500; }
+
+/* stopka z logo */
+.footer__logo { width: min(100%, 1100px); margin: 0 auto 70px; opacity: .95; }
+
+/* ---------- HERO 3D ---------- */
+.hero__bg3d { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero__sticky { background: radial-gradient(120% 90% at 50% 40%, #4a0d1a 0%, #24070e 55%, #14040a 100%); }
+.hero__vignette { background: radial-gradient(120% 90% at 50% 50%, transparent 50%, rgba(18,3,7,.8) 100%), linear-gradient(180deg, rgba(28,6,11,.5) 0%, transparent 22%, transparent 72%, var(--bg) 100%); }
+.fb-glow { background: radial-gradient(closest-side, rgba(255,170,120,.4), rgba(143,211,244,.08) 70%, transparent); }
+.fb-mug { filter: drop-shadow(0 50px 60px rgba(10,0,3,.7)) drop-shadow(-24px 0 50px rgba(255,140,80,.25)) drop-shadow(24px 0 50px rgba(143,211,244,.18)); }
+.hero__title { text-shadow: 0 12px 50px rgba(20,2,6,.6); }
+.hero__slide--1 .hero__title { font-size: clamp(54px, 8vw, 150px); }
+.hero__big { font-size: clamp(34px, 4.2vw, 64px); }
+.hero.is-fallback .hero__fallback { background: transparent; }
+
+/* ---------- globus w barwach marki ---------- */
+.globe-sec { background: radial-gradient(70% 55% at 55% 50%, #3a0a15, var(--bg) 72%); }
+.city-label { background: var(--cream); color: var(--wine); font-family: var(--display); font-weight: 400; }
+.live-dot { background: var(--ice); box-shadow: 0 0 0 0 rgba(143,211,244,.6); }
+@keyframes live { 70% { box-shadow: 0 0 0 10px rgba(143,211,244,0); } 100% { box-shadow: 0 0 0 0 rgba(143,211,244,0); } }
+.order-toast { background: rgba(51,12,22,.75); }

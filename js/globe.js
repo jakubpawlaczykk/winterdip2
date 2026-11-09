@@ -43,13 +43,13 @@ export function initGlobe(reduced) {
         float l = dot(texture2D(land, vUv).rgb, vec3(.299,.587,.114));
         float n = dot(texture2D(night, vUv).rgb, vec3(.299,.587,.114));
         float isLand = 1. - smoothstep(.025, .07, l);
-        vec3 ocean = vec3(.03,.02,.018) + l * .15;
-        vec3 ground = vec3(.26,.15,.09);
+        vec3 ocean = vec3(.07,.012,.024) + l * .12;
+        vec3 ground = vec3(.42,.06,.11);
         vec3 col = mix(ocean, ground, isLand);
-        col += vec3(1.,.66,.32) * smoothstep(.12,.7,n) * 1.1;
+        col += vec3(.97,.91,.84) * smoothstep(.12,.7,n) * 1.15;
         float facing = max(dot(vN, vV), 0.);
         col *= .55 + .45 * facing;
-        col += vec3(.95,.5,.25) * pow(1. - facing, 3.) * .45;
+        col += vec3(.56,.83,.96) * pow(1. - facing, 3.) * .55;
         gl_FragColor = vec4(col, 1.);
       }`,
   });
@@ -60,7 +60,7 @@ export function initGlobe(reduced) {
   const atm = new THREE.Mesh(new THREE.SphereGeometry(1.12, 64, 64), new THREE.ShaderMaterial({
     side: THREE.BackSide, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
     vertexShader: `varying vec3 vN; void main(){ vN=normalize(normalMatrix*normal); gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `varying vec3 vN; void main(){ float i = pow(max(.62 - dot(vN, vec3(0,0,1.)), 0.), 4.); gl_FragColor = vec4(1.,.55,.25,1.) * i * 2.2; }`,
+    fragmentShader: `varying vec3 vN; void main(){ float i = pow(max(.62 - dot(vN, vec3(0,0,1.)), 0.), 4.); gl_FragColor = vec4(.56,.83,.96,1.) * i * 2.; }`,
   }));
   scene.add(atm);
 
@@ -72,14 +72,14 @@ export function initGlobe(reduced) {
     sp.set([v.x, v.y, v.z], i);
   }
   starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffe6cc, size: 0.05, transparent: true, opacity: 0.7 }));
+  const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xf6e9d7, size: 0.05, transparent: true, opacity: 0.7 }));
   scene.add(stars);
 
   // city markers
   const dotTex = makeDotTexture();
   const markers = CITIES.map((c) => {
     const pos = latLon(c.lat, c.lon, 1.005);
-    const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, color: 0xff3b3b, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, color: 0xf6e9d7, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
     m.position.copy(pos); m.scale.setScalar(0.014 + c.w * 0.0012);
     spin.add(m);
     return { ...c, pos, sprite: m };
@@ -88,13 +88,13 @@ export function initGlobe(reduced) {
   // pulses + beams
   const pulses = [];
   function pulse(city) {
-    const ring = new THREE.Mesh(new THREE.RingGeometry(0.004, 0.009, 48), new THREE.MeshBasicMaterial({ color: 0xffb36b, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.004, 0.009, 48), new THREE.MeshBasicMaterial({ color: 0x8fd3f4, transparent: true, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending }));
     ring.position.copy(city.pos.clone().multiplyScalar(1.002));
     ring.lookAt(city.pos.clone().multiplyScalar(2));
     spin.add(ring);
     const beamGeo = new THREE.CylinderGeometry(0.0025, 0.0025, 0.16, 8, 1, true);
     beamGeo.translate(0, 0.08, 0);
-    const beam = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({ color: 0xff5a3c, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    const beam = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({ color: 0xf6e9d7, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
     beam.position.copy(city.pos);
     beam.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), city.pos.clone().normalize());
     spin.add(beam);
@@ -172,7 +172,7 @@ function makeDotTexture() {
   const c = document.createElement('canvas'); c.width = c.height = 64;
   const g = c.getContext('2d');
   const grd = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.25, 'rgba(255,200,160,.9)'); grd.addColorStop(1, 'rgba(255,80,40,0)');
+  grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.25, 'rgba(246,233,215,.9)'); grd.addColorStop(1, 'rgba(143,211,244,0)');
   g.fillStyle = grd; g.fillRect(0, 0, 64, 64);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }

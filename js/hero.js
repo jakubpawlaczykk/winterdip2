@@ -29,6 +29,8 @@ export async function initHero(reduced) {
     if (loader) loader.style.opacity = 0;
   }
   initSnow(hero.querySelector('.snow'), reduced);
+  const bg3d = hero.querySelector('.hero__bg3d');
+  if (bg3d) import('./hero-bg.js').then((m) => m.initHeroBg(bg3d, state, reduced)).catch((e) => console.warn('3D bg disabled', e));
 
   // copy slides timeline
   const slides = hero.querySelectorAll('.hero__slide');
@@ -118,17 +120,6 @@ function initSequence(canvas, m, state, loader) {
 
 function initFallback(hero, state) {
   const mug = hero.querySelector('.fb-mug');
-  const bokeh = hero.querySelector('.fb-bokeh');
-  const room = hero.querySelector('.fb-room');
-  // bokeh dots
-  const colors = ['255,200,120', '255,150,80', '255,230,170', '120,160,255', '255,90,70'];
-  for (let i = 0; i < 26; i++) {
-    const s = 20 + Math.random() * 110;
-    const el = document.createElement('i');
-    const c = colors[i % colors.length];
-    el.style.cssText = `width:${s}px;height:${s}px;left:${Math.random() * 100}%;top:${Math.random() * 100}%;--d:${3 + Math.random() * 4}s;background:radial-gradient(circle, rgba(${c},.7), rgba(${c},.12) 60%, transparent 70%)`;
-    bokeh.appendChild(el);
-  }
   const gsap_ = window.gsap;
   state.render = () => {
     const p = state.p;
@@ -138,8 +129,6 @@ function initFallback(hero, state) {
       y: Math.sin(p * Math.PI) * -30,
       scale: 1 + Math.sin(p * Math.PI) * 0.18,
     });
-    gsap_.set(bokeh, { y: p * -120, scale: 1 + p * 0.15 });
-    gsap_.set(room, { scale: 1 + p * 0.08 });
   };
   // idle float
   gsap_.to(hero.querySelector('.fb-mug-wrap'), { y: -14, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1 });
