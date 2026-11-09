@@ -131,7 +131,7 @@ export async function initHero(reduced) {
 
 // ---------- śnieg nad filmem: pada CAŁY CZAS, także bez scrollowania ----------
 // Mieszanka: kryształki-śnieżynki (jak w logo) + miękkie płatki, 3 warstwy głębi.
-function initHeroSnow(canvas, reduced) {
+export function initHeroSnow(canvas, reduced) {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const dpr = Math.min(devicePixelRatio || 1, 2);

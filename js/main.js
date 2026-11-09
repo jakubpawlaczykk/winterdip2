@@ -83,12 +83,7 @@ if (rows) {
   const card = (r) => `<article class="r-card"><span class="stars" aria-label="${r.stars} na 5">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</span><p>„${r.text}”</p><footer><span class="avatar">${r.name[0]}</span><div><b>${r.name}</b> · ${r.city}${r.verified ? '<span class="verified">✓ Zweryfikowany zakup</span>' : ''}</div></footer></article>`;
   const half = Math.ceil(REVIEWS.length / 2);
   const a = REVIEWS.slice(0, half), b = REVIEWS.slice(half);
-  rows.innerHTML = [a, b].map((set) => `<div class="reviews__row">${[...set, ...set, ...set].map(card).join('')}</div>`).join('');
-  const [r1, r2] = rows.querySelectorAll('.reviews__row');
-  if (!reduced) {
-    gsap.fromTo(r1, { x: '-5%' }, { x: '-35%', ease: 'none', scrollTrigger: { trigger: rows, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-    gsap.fromTo(r2, { x: '-35%' }, { x: '-5%', ease: 'none', scrollTrigger: { trigger: rows, start: 'top bottom', end: 'bottom top', scrub: 0.8 } });
-  }
+  rows.innerHTML = [a, b].map((set, i) => `<div class="reviews__row${i ? ' reviews__row--right' : ''}">${[...set, ...set].map(card).join('')}</div>`).join('');
 }
 
 // gallery horizontal

@@ -575,3 +575,73 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   .has-announce .header.is-hidden { transform: translateY(calc(-100% - 34px)); }
 }
 .in-hero.has-announce .header.is-hidden { transform: none; }
+
+/* =========================================================
+   v5 — paleta z wnętrza chatki z hero (drewno, ogień, krem)
+   ========================================================= */
+:root {
+  --bg: #1a110b;
+  --bg-2: #22160e;
+  --bg-3: #2c1d13;
+  --gold: #f2b05e;          /* ciepłe światło kominka */
+  --gold-soft: rgba(242, 176, 94, 0.14);
+  --ice: #f2b05e;
+  --line: rgba(246, 233, 215, 0.1);
+  --footer: #2a0910;        /* stopka w burgundzie marki */
+}
+body { background: var(--bg); }
+.reviews, .contact { background: var(--bg-2); }
+.p-card, .r-card, .field input, .field textarea { background-color: var(--bg-3); }
+.p-card { background: linear-gradient(160deg, #33231a, #22160e); }
+
+/* nagłówki zawsze jednym kolorem */
+.display em, .g-text p em { color: inherit; }
+
+/* hero: nagłówek zawsze w 2 liniach */
+.hero__overlay { max-width: none; }
+.hero__headline span { white-space: nowrap; }
+.hero__headline em { color: #a9d8f2; }
+@media (max-width: 760px) { .hero__headline { font-size: clamp(30px, 9.2vw, 44px); } }
+
+/* miejsca na zdjęcia produktów */
+.p-card__media::before { display: none; }
+.ph { position: absolute; inset: 18px; border: 1.5px dashed rgba(246,233,215,.22); border-radius: 18px; display: grid; place-content: center; text-align: center; gap: 6px; color: var(--cream-dim); background: repeating-linear-gradient(135deg, rgba(246,233,215,.025) 0 14px, transparent 14px 28px); }
+.ph span { font-family: var(--display); font-weight: 700; font-size: 20px; color: var(--cream); }
+.ph small { font-size: 13px; }
+.ph-note { display: inline-block; margin-top: 14px; padding: 6px 12px; border-radius: 99px; border: 1px dashed rgba(246,233,215,.35); font-size: 12px; letter-spacing: .08em; color: var(--cream-dim); }
+
+/* opinie: dwie karuzele w przeciwne strony, cały czas w ruchu */
+.reviews__rows { display: grid; gap: 20px; }
+.reviews__row { display: flex; gap: 20px; width: max-content; animation: rev-left 70s linear infinite; }
+.reviews__row--right { animation-name: rev-right; animation-duration: 80s; }
+.reviews__rows:hover .reviews__row { animation-play-state: paused; }
+@keyframes rev-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes rev-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+.r-card { width: 380px; }
+@media (max-width: 600px) { .r-card { width: 300px; } }
+
+/* FAQ: sam nagłówek na środku, pod nim pytania */
+.faq__wrap { max-width: 860px; }
+.faq__title { text-align: center; margin-bottom: clamp(36px, 5vw, 64px); }
+
+/* kontakt: nagłówek równo z górą formularza */
+.contact__grid { align-items: start; }
+.contact__title { margin: 0; }
+.form { gap: 14px; }
+
+/* stopka odgrodzona kolorem */
+.footer { background: var(--footer); border-top: 0; padding-top: 80px; }
+.footer__bottom { border-top-color: rgba(246,233,215,.12); }
+
+/* globus: tło w klimacie chatki, zimowe */
+.globe-sec { background: radial-gradient(80% 60% at 70% 45%, #3a2416 0%, #22160e 55%, var(--bg) 100%); }
+.globe-snow { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+.globe-canvas { z-index: 0; }
+.globe-copy, .order-feed, .demo-badge { z-index: 3; }
+.city-label { background: var(--cream); color: #2a0910; }
+.order-toast { background: rgba(34,22,14,.78); }
+.pl-label { position: absolute; z-index: 2; pointer-events: none; transform: translate(-50%, -140%); font-size: 11px; font-weight: 800; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,.9); white-space: nowrap; opacity: 0; transition: opacity .4s; }
+.pl-label::after { content: ""; position: absolute; left: 50%; top: 100%; width: 5px; height: 5px; margin: 3px 0 0 -2.5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.gallery__pin { padding-top: 120px; box-sizing: border-box; }
+.gallery__head { margin-bottom: 28px; }
+.g-item { height: min(56vh, 600px); }

@@ -52,6 +52,14 @@ export const REVIEWS = [
   { name: 'Placeholder O.', city: 'Łódź', text: 'Szybka wysyłka, porządnie zapakowane, kubek robi wrażenie.', stars: 4 },
   { name: 'Placeholder E.', city: 'Lublin', text: 'Truskawki w czekoladzie przy kominku — więcej nie trzeba.', stars: 5 },
   { name: 'Placeholder P.', city: 'Szczecin', text: 'Widelczyk wygodnie trzyma się w uchu kubka. Przemyślany detal.', stars: 5 },
+  { name: 'Placeholder R.', city: 'Rzeszów', text: 'Dzieci zachwycone — wieczór z owocami w czekoladzie stał się naszą tradycją.', stars: 5 },
+  { name: 'Placeholder B.', city: 'Białystok', text: 'Kolor kubka na żywo jeszcze ładniejszy. Idealnie pasuje do świąt.', stars: 5 },
+  { name: 'Placeholder N.', city: 'Bydgoszcz', text: 'Podarowałam mamie, teraz sama chcę drugi dla siebie.', stars: 5 },
+  { name: 'Placeholder Z.', city: 'Zakopane', text: 'Po nartach nie ma nic lepszego niż ciepła czekolada z tego kubka.', stars: 5 },
+  { name: 'Placeholder G.', city: 'Gdynia', text: 'Świetny prezent dla pary. Zestaw dla dwojga robi robotę.', stars: 5 },
+  { name: 'Placeholder S.', city: 'Katowice', text: 'Podgrzewacz trzyma temperaturę dłużej, niż się spodziewałem.', stars: 4 },
+  { name: 'Placeholder O.', city: 'Olsztyn', text: 'Ładnie zapakowany, gotowy do położenia pod choinkę.', stars: 5 },
+  { name: 'Placeholder T.', city: 'Toruń', text: 'Pierniki maczane w czekoladzie — od teraz obowiązkowo co weekend.', stars: 5 },
 ];
 
 // Miasta do wizualizacji zamówień na globusie [lat, lon]

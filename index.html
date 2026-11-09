@@ -72,13 +72,6 @@
       </div>
     </section>
 
-    <!-- ================= MARQUEE ================= -->
-    <div class="marquee" aria-hidden="true">
-      <div class="marquee__track">
-        <div class="marquee__item">Darmowa dostawa od 149 zł</div><div class="marquee__item">Wysyłka w 24 h</div><div class="marquee__item">Dostawa przed Wigilią</div><div class="marquee__item">30 dni na zwrot</div><div class="marquee__item">Pakowanie na prezent</div>
-        <div class="marquee__item">Darmowa dostawa od 149 zł</div><div class="marquee__item">Wysyłka w 24 h</div><div class="marquee__item">Dostawa przed Wigilią</div><div class="marquee__item">30 dni na zwrot</div><div class="marquee__item">Pakowanie na prezent</div>
-      </div>
-    </div>
 
     <!-- ================= PRODUCTS ================= -->
     <section class="section" id="produkty">
@@ -93,7 +86,7 @@
         <div class="products-grid">
           <article class="p-card" data-tilt data-reveal>
             <span class="badge">Bestseller</span>
-            <a href="produkty.html#chocolate-mug" class="p-card__media"><img class="p-card__img" src="assets/img/mug.webp" alt="Kubek Chocolate… do fondue" loading="lazy"></a>
+            <a href="produkty.html#chocolate-mug" class="p-card__media"><div class="ph"><span>Zdjęcie produktu</span><small>kubek Chocolate…</small></div></a>
             <div class="p-card__body">
               <div class="p-card__top">
                 <div><h3 class="p-card__name">Chocolate… kubek do fondue</h3><p class="p-card__desc">Ceramiczny kubek z podgrzewaczem i widelczykiem</p></div>
@@ -108,7 +101,7 @@
           </article>
           <article class="p-card" data-tilt data-reveal=".12">
             <span class="badge badge--red">Oszczędzasz 33%</span>
-            <a href="produkty.html#chocolate-duo" class="p-card__media"><div class="p-card__duo"><img src="assets/img/mug.webp" alt="" loading="lazy"><img src="assets/img/mug.webp" alt="Zestaw dwóch kubków Chocolate…" loading="lazy"></div></a>
+            <a href="produkty.html#chocolate-duo" class="p-card__media"><div class="ph"><span>Zdjęcie produktu</span><small>zestaw dla dwojga</small></div></a>
             <div class="p-card__body">
               <div class="p-card__top">
                 <div><h3 class="p-card__name">Zestaw dla dwojga</h3><p class="p-card__desc">2 × kubek Chocolate… + 12 podgrzewaczy gratis</p></div>
@@ -149,6 +142,7 @@
         <div class="container gallery__head">
           <span class="eyebrow">Galeria</span>
           <h2 class="display h2" data-split>Z bliska</h2>
+          <span class="ph-note">Zdjęcia poglądowe — zostaną podmienione</span>
         </div>
         <div class="gallery__track">
           <figure class="g-item g-item--wide">
@@ -156,7 +150,7 @@
             <img src="assets/img/mug.webp" alt="Kubek Chocolate… w całości" loading="lazy" style="--w:62%;--x:19%;--y:6%">
             <figcaption><span>Chocolate…</span><span>01</span></figcaption>
           </figure>
-          <div class="g-text"><p>Płomień, który <em style="color:var(--gold)">trzyma ciepło</em> przez cały wieczór.</p></div>
+          <div class="g-text"><p>Płomień, który <em>trzyma ciepło</em> przez cały wieczór.</p></div>
           <figure class="g-item g-item--tall">
             <div class="g-item__bg" style="background:radial-gradient(70% 60% at 40% 80%,#7a3510,#140a07)"></div>
             <img src="assets/img/mug.webp" alt="Podgrzewacz w podstawie kubka" loading="lazy" style="--w:230%;--x:-58%;--y:-112%">
@@ -177,7 +171,7 @@
             <img src="assets/img/mug.webp" alt="Widelczyk do fondue" loading="lazy" style="--w:200%;--x:-112%;--y:-6%">
             <figcaption><span>Widelczyk</span><span>05</span></figcaption>
           </figure>
-          <div class="g-text"><p>Gotowy pod choinkę — <em style="color:var(--gold)">w pudełku prezentowym.</em></p><a href="produkty.html" class="btn btn--primary" style="margin-top:28px">Kup teraz</a></div>
+          <div class="g-text"><p>Gotowy pod choinkę — <em>w pudełku prezentowym.</em></p><a href="produkty.html" class="btn btn--primary" style="margin-top:28px">Kup teraz</a></div>
         </div>
       </div>
     </section>
@@ -202,12 +196,8 @@
 
     <!-- ================= FAQ ================= -->
     <section class="section" id="faq">
-      <div class="container faq__grid">
-        <div class="faq__aside">
-          <span class="eyebrow">FAQ</span>
-          <h2 class="display h2" data-split style="margin-top:22px">Pytania<br><em>i odpowiedzi</em></h2>
-          <p class="lead" style="margin-top:24px" data-reveal>Nie ma tu Twojego pytania? <a href="#kontakt" style="color:var(--gold);text-decoration:underline">Napisz do nas</a> — odpowiadamy w ciągu kilku godzin.</p>
-        </div>
+      <div class="container faq__wrap">
+        <h2 class="display h2 faq__title" data-reveal>FAQ</h2>
         <div class="faq__list"></div>
       </div>
     </section>
@@ -216,8 +206,7 @@
     <section class="section contact" id="kontakt">
       <div class="container contact__grid">
         <div>
-          <span class="eyebrow">Kontakt</span>
-          <h2 class="display h2" data-split style="margin-top:22px">Porozmawiajmy<br><em>przy czekoladzie</em></h2>
+          <h2 class="display h2 contact__title" data-split>Porozmawiajmy<br><em>przy czekoladzie</em></h2>
           <div class="contact__links" data-reveal>
             <a href="mailto:kontakt@winterdip.pl">kontakt@winterdip.pl <span>↗</span></a>
             <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram <span>↗</span></a>
@@ -238,7 +227,6 @@
   <!-- ================= FOOTER ================= -->
   <footer class="footer">
     <div class="container">
-      <img class="footer__logo" src="assets/brand/logo-cream.webp" alt="" loading="lazy" width="1000" height="333">
       <div class="footer__grid">
         <div>
           <h4>Newsletter</h4>
