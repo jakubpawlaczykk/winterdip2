@@ -1,16 +1,28 @@
 // =========================================================
-// HERO — film sterowany scrollem (sekwencja klatek na <canvas>)
-// Klatki generuje tools/extract-frames.sh -> assets/hero/
-// Bez klatek uruchamia się fallback ze zdjęciem kubka.
+// HERO — film na pełny ekran sterowany scrollem
+// Klatki: tools/extract-frames.sh -> assets/hero/
+//
+// Płynność:
+//  - klatki dekodowane poza głównym wątkiem (createImageBitmap)
+//  - pozycja filmu „dogania” scroll z lekką bezwładnością (lerp)
+//  - przenikanie sąsiednich klatek -> brak skoków między klatkami
+//  - rysowanie tylko gdy coś się zmieniło
 // =========================================================
 const gsap = window.gsap;
+const ScrollTrigger = window.ScrollTrigger;
 
 export async function initHero(reduced) {
   const hero = document.querySelector('.hero');
   if (!hero) return;
   const canvas = hero.querySelector('.hero__canvas');
-  const progressEl = hero.querySelector('.hero__progress');
   const loader = hero.querySelector('.hero__loader');
+
+  // w hero widać tylko logo
+  ScrollTrigger.create({
+    trigger: hero, start: 'top top', end: 'bottom 60%',
+    onToggle: (self) => document.documentElement.classList.toggle('in-hero', self.isActive),
+  });
+  if (scrollY < hero.offsetTop + hero.offsetHeight * 0.85) document.documentElement.classList.add('in-hero');
 
   let manifest = null;
   try {
@@ -18,155 +30,96 @@ export async function initHero(reduced) {
     if (r.ok) manifest = await r.json();
   } catch {}
 
-  const state = { p: 0 };
-  const setProgress = (p) => { if (progressEl) progressEl.textContent = String(Math.round(p * 100)).padStart(3, '0') + ' / 100'; };
-
-  if (manifest && manifest.count > 0) {
-    initSequence(canvas, manifest, state, loader);
-  } else {
+  if (!manifest || !manifest.count) {
     hero.classList.add('is-fallback');
-    initFallback(hero, state);
     if (loader) loader.style.opacity = 0;
-  }
-  initSnow(hero.querySelector('.snow'), reduced);
-  const bg3d = hero.querySelector('.hero__bg3d');
-  if (bg3d) import('./hero-bg.js').then((m) => m.initHeroBg(bg3d, state, reduced)).catch((e) => console.warn('3D bg disabled', e));
-
-  // copy slides timeline
-  const slides = hero.querySelectorAll('.hero__slide');
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: hero, start: 'top top', end: 'bottom bottom', scrub: reduced ? true : 0.6,
-      onUpdate: (self) => { state.p = self.progress; state.bgHidden = !hero.classList.contains("is-fallback") && self.progress > 0.17 && self.progress < 0.9; setProgress(self.progress); state.render?.(); },
-    },
-  });
-  // slide 1 visible at start
-  gsap.set(slides[0], { opacity: 1 });
-  tl.to(slides[0], { opacity: 0, y: -60, filter: 'blur(10px)', duration: 0.12, ease: 'power2.in' }, 0.06)
-    .to(hero.querySelector('.scroll-hint'), { opacity: 0, duration: 0.05 }, 0.02)
-    .fromTo(slides[1], { opacity: 0, x: -40, filter: 'blur(10px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: 0.1 }, 0.24)
-    .to(slides[1], { opacity: 0, x: -40, filter: 'blur(10px)', duration: 0.1 }, 0.42)
-    .fromTo(slides[2], { opacity: 0, x: 40, filter: 'blur(10px)' }, { opacity: 1, x: 0, filter: 'blur(0px)', duration: 0.1 }, 0.5)
-    .to(slides[2], { opacity: 0, x: 40, filter: 'blur(10px)', duration: 0.1 }, 0.68)
-    .fromTo(slides[3], { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.12 }, 0.78)
-    .to({}, { duration: 0.1 }, 0.9);
-
-  // WOW: film startuje w zaokrąglonej ramce otoczonej sceną 3D,
-  // przy scrollu otwiera się na cały ekran, a na końcu znów zamyka w kartę
-  if (!hero.classList.contains('is-fallback')) {
-    const mob = matchMedia('(max-width: 760px)').matches;
-    const framed = mob ? 'inset(11% 5% 15% 5% round 28px)' : 'inset(14% 11% 12% 11% round 40px)';
-    const card = mob ? 'inset(4% 3% 4% 3% round 24px)' : 'inset(5% 4% 5% 4% round 32px)';
-    const full = 'inset(0% 0% 0% 0% round 0px)';
-    gsap.set(canvas, { clipPath: framed });
-    tl.fromTo(canvas, { clipPath: framed, scale: 1.04 }, { clipPath: full, scale: 1, duration: 0.15, ease: 'power2.inOut' }, 0)
-      .fromTo(canvas, { clipPath: full }, { clipPath: card, duration: 0.08, ease: 'power2.in', immediateRender: false }, 0.92);
+    return;
   }
 
-  // entrance
-  if (!reduced) {
-    gsap.from(slides[0].querySelectorAll('.split-line > span'), { yPercent: 110, duration: 1.4, stagger: 0.08, ease: 'expo.out', delay: 0.2 });
-    gsap.from(slides[0].querySelector('.hero__sub'), { opacity: 0, y: 20, duration: 1.2, delay: 0.8, ease: 'expo.out' });
-  }
-}
-
-function initSequence(canvas, m, state, loader) {
-  const ctx = canvas.getContext('2d');
-  const isMobile = matchMedia('(max-width: 760px)').matches && m.mobile;
-  const src = isMobile ? m.mobile : m;
-  const frames = new Array(src.count);
-  let loaded = 0, lastDrawn = -1;
+  const mobile = matchMedia('(max-width: 760px)').matches && manifest.mobile;
+  const src = mobile ? manifest.mobile : manifest;
+  const N = src.count;
   const url = (i) => `assets/hero/${src.dir}/${String(i + 1).padStart(4, '0')}.${src.ext || 'webp'}`;
+  const frames = new Array(N);
+  const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 
+  // ---------- scroll -> docelowa pozycja ----------
+  let target = 0, current = 0;
+  ScrollTrigger.create({
+    trigger: hero, start: 'top top', end: 'bottom bottom',
+    onUpdate: (self) => { target = self.progress * (N - 1); },
+  });
+
+  // ---------- rozmiar canvasa ----------
+  let cw = 0, ch = 0, dirty = true;
   function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = canvas.clientWidth * dpr;
-    canvas.height = canvas.clientHeight * dpr;
-    lastDrawn = -1; draw();
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    cw = canvas.width = Math.round(canvas.clientWidth * dpr);
+    ch = canvas.height = Math.round(canvas.clientHeight * dpr);
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    dirty = true;
   }
-  function nearestLoaded(i) {
-    if (frames[i]?.complete) return frames[i];
-    for (let d = 1; d < src.count; d++) {
-      if (frames[i - d]?.complete && frames[i - d].naturalWidth) return frames[i - d];
-      if (frames[i + d]?.complete && frames[i + d].naturalWidth) return frames[i + d];
-    }
-    return null;
-  }
-  function draw() {
-    const i = Math.min(src.count - 1, Math.floor(state.p * (src.count - 1)));
-    if (i === lastDrawn) return;
-    const img = nearestLoaded(i);
-    if (!img) return;
-    if (img === frames[i]) lastDrawn = i;
-    const cw = canvas.width, ch = canvas.height;
-    const s = Math.max(cw / img.naturalWidth, ch / img.naturalHeight);
-    const w = img.naturalWidth * s, h = img.naturalHeight * s;
-    ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
-  }
-  state.render = () => requestAnimationFrame(draw);
-
-  // load order: first frame, then every 8th, 4th, 2nd, rest — scrubbing works early
-  const order = [];
-  const seen = new Set();
-  [16, 8, 4, 2, 1].forEach((step) => { for (let i = 0; i < src.count; i += step) if (!seen.has(i)) { seen.add(i); order.push(i); } });
-  let cursor = 0;
-  const pump = () => {
-    if (cursor >= order.length) return;
-    const i = order[cursor++];
-    const img = new Image();
-    img.decoding = 'async';
-    img.onload = img.onerror = () => {
-      loaded++;
-      if (loader) { loader.style.width = (loaded / src.count) * 100 + '%'; if (loaded === src.count) loader.style.opacity = 0; }
-      if (i === 0) resize();
-      state.render();
-      pump();
-    };
-    img.src = url(i);
-    frames[i] = img;
-  };
-  for (let k = 0; k < 6; k++) pump();
   addEventListener('resize', resize);
   resize();
-}
 
-function initFallback(hero, state) {
-  const mug = hero.querySelector('.fb-mug');
-  const gsap_ = window.gsap;
-  state.render = () => {
-    const p = state.p;
-    gsap_.set(mug, {
-      rotateY: Math.sin(p * Math.PI * 2) * 22,
-      rotateZ: -6 + p * 12,
-      y: Math.sin(p * Math.PI) * -30,
-      scale: 1 + Math.sin(p * Math.PI) * 0.18,
-    });
+  // ---------- rysowanie ----------
+  const nearest = (i, dir) => {
+    for (let d = 0; d < N; d++) {
+      const j = i + d * dir;
+      if (j >= 0 && j < N && frames[j]) return frames[j];
+      const k = i - d * dir;
+      if (k >= 0 && k < N && frames[k]) return frames[k];
+    }
+    return null;
   };
-  // idle float
-  gsap_.to(hero.querySelector('.fb-mug-wrap'), { y: -14, duration: 3, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-  state.render();
-}
+  function cover(img, alpha) {
+    const s = Math.max(cw / img.width, ch / img.height);
+    const w = img.width * s, h = img.height * s;
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(img, (cw - w) / 2, (ch - h) / 2, w, h);
+  }
+  let lastKey = '';
+  function draw() {
+    const i = Math.floor(current);
+    const f = current - i;
+    const a = frames[i] || nearest(i, -1);
+    if (!a) return;
+    const b = f > 0.02 && i + 1 < N ? frames[i + 1] : null;
+    const key = `${i}|${b ? f.toFixed(2) : 0}|${a === frames[i]}|${cw}`;
+    if (key === lastKey && !dirty) return;
+    lastKey = key; dirty = false;
+    cover(a, 1);
+    if (b) cover(b, f);
+    ctx.globalAlpha = 1;
+  }
 
-function initSnow(canvas, reduced) {
-  if (!canvas || reduced) return;
-  const ctx = canvas.getContext('2d');
-  let w, h, flakes = [];
-  const resize = () => {
-    w = canvas.width = canvas.clientWidth; h = canvas.height = canvas.clientHeight;
-    flakes = Array.from({ length: Math.round(w / 14) }, () => ({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.8 + 0.4, s: Math.random() * 0.5 + 0.2, d: Math.random() * Math.PI * 2 }));
-  };
-  resize(); addEventListener('resize', resize);
-  let visible = true;
-  new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(canvas);
   (function loop() {
     requestAnimationFrame(loop);
-    if (!visible) return;
-    ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = 'rgba(255,245,235,.7)';
-    for (const f of flakes) {
-      f.y += f.s; f.d += 0.01; f.x += Math.sin(f.d) * 0.3;
-      if (f.y > h) { f.y = -5; f.x = Math.random() * w; }
-      ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, 7); ctx.fill();
-    }
+    const diff = target - current;
+    current = reduced || Math.abs(diff) < 0.01 ? target : current + diff * 0.22;
+    draw();
   })();
+
+  // ---------- ładowanie: najpierw co 16. klatka, potem gęściej ----------
+  const order = [], seen = new Set();
+  [32, 16, 8, 4, 2, 1].forEach((step) => { for (let i = 0; i < N; i += step) if (!seen.has(i)) { seen.add(i); order.push(i); } });
+  let cursor = 0, loaded = 0;
+  const useBitmap = 'createImageBitmap' in window;
+  async function load(i) {
+    try {
+      if (useBitmap) {
+        const blob = await (await fetch(url(i))).blob();
+        frames[i] = await createImageBitmap(blob);
+      } else {
+        const img = new Image(); img.src = url(i); await img.decode(); frames[i] = img;
+      }
+    } catch {}
+    loaded++;
+    if (loader) { loader.style.width = (loaded / N) * 100 + '%'; if (loaded === N) loader.style.opacity = 0; }
+    if (i === 0 || Math.abs(i - current) < 2) dirty = true;
+  }
+  async function worker() { while (cursor < order.length) await load(order[cursor++]); }
+  await load(order[cursor++]); // pierwsza klatka od razu
+  for (let k = 0; k < 6; k++) worker();
 }
