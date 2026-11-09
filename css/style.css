@@ -17,7 +17,7 @@
   --ice: #8fd3f4;
   --ice-deep: #2fa6e0;
   --line: rgba(246, 233, 215, 0.12);
-  --display: "Cherry Bomb One", "Cooper Black", system-ui, sans-serif;
+  --display: "Baloo 2", system-ui, sans-serif;
   --serif: var(--display);
   --sans: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
@@ -546,3 +546,20 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
   .hero__lead { font-size: 15px; }
   .hero__scrim { background: linear-gradient(180deg, rgba(18,3,7,.75) 0%, rgba(18,3,7,.25) 30%, transparent 45%), linear-gradient(0deg, rgba(18,3,7,.7) 0%, transparent 22%); }
 }
+
+/* ostrość: bez warstwy szumu i bez rasteryzacji tekstu */
+.grain { display: none; }
+.split-line > span, .fb-mug { will-change: auto; }
+
+/* =========================================================
+   FONT v3 — Baloo 2 (nagłówki, przyciski), Nunito (tekst)
+   ========================================================= */
+.display, .hero__headline, .p-card__name, .pdp__title, .compare thead th,
+.price__now, .pdp__price .now, .reviews__score, .globe-stats b, .g-text p,
+.contact__links a, .marquee__item, .city-label { font-family: var(--display); font-weight: 800; letter-spacing: -0.01em; }
+.display, .hero__headline { line-height: 1.0; }
+.btn { font-family: var(--display); font-weight: 800; font-size: 16px; letter-spacing: 0; padding-top: 2px; }
+.h2 { font-size: clamp(40px, 6vw, 90px); }
+.hero__headline { font-size: clamp(42px, 4.4vw, 76px); }
+.p-card__name { font-size: clamp(26px, 2.4vw, 34px); }
+.marquee__item { font-weight: 700; }
