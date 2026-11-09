@@ -516,3 +516,33 @@ button { font: inherit; color: inherit; cursor: pointer; border: 0; background: 
 .in-hero.has-announce .header { top: 0; }
 .in-hero .logo img { filter: drop-shadow(0 4px 18px rgba(0,0,0,.45)); }
 .announce { position: fixed; top: 0; left: 0; right: 0; }
+
+/* =========================================================
+   HERO v4 — warstwa śniegu + napis sprzedażowy i 2 przyciski
+   ========================================================= */
+.hero__snow { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+.hero__scrim { position: absolute; inset: 0; z-index: 2; pointer-events: none;
+  background: linear-gradient(90deg, rgba(18,3,7,.62) 0%, rgba(18,3,7,.25) 32%, transparent 55%),
+              linear-gradient(0deg, rgba(18,3,7,.55) 0%, transparent 38%); }
+.hero__overlay { position: absolute; z-index: 3; left: var(--gutter); bottom: 11vh; max-width: min(520px, 34vw); }
+.hero__kicker { margin: 0 0 14px; font-size: 12px; font-weight: 800; letter-spacing: .3em; text-transform: uppercase; color: var(--ice); }
+.hero__headline { margin: 0; font-family: var(--display); font-weight: 400; line-height: 1.02; font-size: clamp(38px, 3.8vw, 66px); color: var(--cream); text-shadow: 0 8px 40px rgba(18,3,7,.6); }
+.hero__headline span { display: block; overflow: hidden; padding-bottom: .04em; }
+.hero__headline em { font-style: normal; color: var(--ice); display: inline-block; }
+.hero__lead { margin: 18px 0 0; font-size: clamp(15px, 1.2vw, 18px); font-weight: 600; color: var(--cream); opacity: .88; max-width: 40ch; text-shadow: 0 2px 14px rgba(18,3,7,.8); }
+.hero__btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; }
+.hero__btns .btn--ghost { background: rgba(246,233,215,.08); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-color: rgba(246,233,215,.35); }
+@media (max-width: 760px) {
+  .hero__overlay { left: var(--gutter); right: var(--gutter); bottom: 6vh; max-width: none; text-align: center; }
+  .hero__btns { justify-content: center; }
+  .hero__btns .btn { flex: 1 1 0; padding: 0 14px; }
+  .hero__scrim { background: linear-gradient(0deg, rgba(18,3,7,.85) 0%, rgba(18,3,7,.4) 30%, transparent 52%); }
+  .hero__lead { margin-left: auto; margin-right: auto; }
+}
+@media (max-width: 760px) {
+  .hero__overlay { top: 10vh; bottom: 5vh; display: flex; flex-direction: column; }
+  .hero__btns { margin-top: auto; }
+  .hero__headline { font-size: clamp(34px, 10vw, 46px); }
+  .hero__lead { font-size: 15px; }
+  .hero__scrim { background: linear-gradient(180deg, rgba(18,3,7,.75) 0%, rgba(18,3,7,.25) 30%, transparent 45%), linear-gradient(0deg, rgba(18,3,7,.7) 0%, transparent 22%); }
+}

@@ -24,6 +24,15 @@ export async function initHero(reduced) {
   });
   if (scrollY < hero.offsetTop + hero.offsetHeight * 0.85) document.documentElement.classList.add('in-hero');
 
+  initHeroSnow(hero.querySelector('.hero__snow'), reduced);
+  if (!reduced) {
+    const ov = hero.querySelector('.hero__overlay');
+    if (ov) {
+      gsap.from(ov.querySelectorAll('.hero__headline > span'), { y: 50, opacity: 0, duration: 1.3, stagger: 0.1, ease: 'expo.out', delay: 0.3 });
+      gsap.from(ov.querySelectorAll('.hero__kicker, .hero__lead, .hero__btns'), { opacity: 0, y: 24, duration: 1.1, stagger: 0.12, ease: 'expo.out', delay: 0.5 });
+    }
+  }
+
   let manifest = null;
   try {
     const r = await fetch('assets/hero/frames.json', { cache: 'no-cache' });
@@ -122,4 +131,62 @@ export async function initHero(reduced) {
   async function worker() { while (cursor < order.length) await load(order[cursor++]); }
   await load(order[cursor++]); // pierwsza klatka od razu
   for (let k = 0; k < 6; k++) worker();
+}
+
+// ---------- śnieg nad filmem: pada cały czas, 3 warstwy głębi ----------
+function initHeroSnow(canvas, reduced) {
+  if (!canvas || reduced) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(devicePixelRatio || 1, 1.5);
+  // gotowe „duszki” płatków: ostry mały i miękki rozmyty
+  const sprite = (size, blur) => {
+    const c = document.createElement('canvas'); c.width = c.height = size;
+    const g = c.getContext('2d');
+    const r = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+    r.addColorStop(0, 'rgba(255,255,255,1)');
+    r.addColorStop(blur ? 0.25 : 0.55, 'rgba(255,250,245,.85)');
+    r.addColorStop(1, 'rgba(255,250,245,0)');
+    g.fillStyle = r; g.fillRect(0, 0, size, size);
+    return c;
+  };
+  const sharp = sprite(32, false), soft = sprite(64, true);
+  const layers = [
+    { n: 0.00022, size: [1.2, 2.6], speed: [18, 30], sway: 10, alpha: [0.35, 0.6], img: sharp, par: 0.15 },
+    { n: 0.0001, size: [2.6, 4.8], speed: [32, 50], sway: 18, alpha: [0.55, 0.85], img: sharp, par: 0.35 },
+    { n: 0.00002, size: [9, 18], speed: [55, 85], sway: 26, alpha: [0.25, 0.45], img: soft, par: 0.7 },
+  ];
+  let w = 0, h = 0, flakes = [];
+  const rnd = (a) => a[0] + Math.random() * (a[1] - a[0]);
+  function resize() {
+    w = canvas.clientWidth; h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    flakes = [];
+    for (const L of layers) {
+      const count = Math.max(6, Math.round(w * h * L.n));
+      for (let i = 0; i < count; i++) flakes.push({ L, x: Math.random() * w, y: Math.random() * h, s: rnd(L.size), v: rnd(L.speed), a: rnd(L.alpha), ph: Math.random() * 6.28, f: 0.4 + Math.random() * 0.8 });
+    }
+  }
+  resize(); addEventListener('resize', resize);
+
+  let visible = true, lastY = scrollY, last = performance.now();
+  new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(canvas);
+  (function loop(now) {
+    requestAnimationFrame(loop);
+    const dt = Math.min((now - last) / 1000, 0.05); last = now;
+    const dy = scrollY - lastY; lastY = scrollY;
+    if (!visible) return;
+    ctx.clearRect(0, 0, w, h);
+    const t = now / 1000;
+    for (const p of flakes) {
+      p.y += p.v * dt - dy * p.L.par;               // opad + paralaksa przy scrollu
+      p.x += Math.sin(t * p.f + p.ph) * p.L.sway * dt + 6 * dt; // kołysanie + lekki wiatr
+      if (p.y > h + 20) { p.y = -20; p.x = Math.random() * w; }
+      if (p.y < -30) { p.y = h + 10; p.x = Math.random() * w; }
+      if (p.x > w + 20) p.x = -20;
+      ctx.globalAlpha = p.a;
+      ctx.drawImage(p.L.img, p.x - p.s, p.y - p.s, p.s * 2, p.s * 2);
+    }
+    ctx.globalAlpha = 1;
+  })(performance.now());
 }
