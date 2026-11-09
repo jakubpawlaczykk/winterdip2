@@ -166,7 +166,7 @@ export function initHeroBg(canvas, state, reduced) {
 
   (function loop() {
     requestAnimationFrame(loop);
-    if (!visible) return;
+    if (!visible || state.bgHidden) return;
     const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
     p += ((state.p || 0) - p) * 0.08;
     mouse.x += (mouse.tx - mouse.x) * 0.04; mouse.y += (mouse.ty - mouse.y) * 0.04;

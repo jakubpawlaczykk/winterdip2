@@ -37,7 +37,7 @@ export async function initHero(reduced) {
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: hero, start: 'top top', end: 'bottom bottom', scrub: reduced ? true : 0.6,
-      onUpdate: (self) => { state.p = self.progress; setProgress(self.progress); state.render?.(); },
+      onUpdate: (self) => { state.p = self.progress; state.bgHidden = !hero.classList.contains("is-fallback") && self.progress > 0.17 && self.progress < 0.9; setProgress(self.progress); state.render?.(); },
     },
   });
   // slide 1 visible at start
@@ -50,6 +50,18 @@ export async function initHero(reduced) {
     .to(slides[2], { opacity: 0, x: 40, filter: 'blur(10px)', duration: 0.1 }, 0.68)
     .fromTo(slides[3], { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.12 }, 0.78)
     .to({}, { duration: 0.1 }, 0.9);
+
+  // WOW: film startuje w zaokrąglonej ramce otoczonej sceną 3D,
+  // przy scrollu otwiera się na cały ekran, a na końcu znów zamyka w kartę
+  if (!hero.classList.contains('is-fallback')) {
+    const mob = matchMedia('(max-width: 760px)').matches;
+    const framed = mob ? 'inset(11% 5% 15% 5% round 28px)' : 'inset(14% 11% 12% 11% round 40px)';
+    const card = mob ? 'inset(4% 3% 4% 3% round 24px)' : 'inset(5% 4% 5% 4% round 32px)';
+    const full = 'inset(0% 0% 0% 0% round 0px)';
+    gsap.set(canvas, { clipPath: framed });
+    tl.fromTo(canvas, { clipPath: framed, scale: 1.04 }, { clipPath: full, scale: 1, duration: 0.15, ease: 'power2.inOut' }, 0)
+      .fromTo(canvas, { clipPath: full }, { clipPath: card, duration: 0.08, ease: 'power2.in', immediateRender: false }, 0.92);
+  }
 
   // entrance
   if (!reduced) {

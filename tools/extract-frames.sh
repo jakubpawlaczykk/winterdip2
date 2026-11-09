@@ -9,10 +9,10 @@ OUT="assets/hero"
 rm -rf "$OUT/desktop" "$OUT/mobile"
 mkdir -p "$OUT/desktop" "$OUT/mobile"
 
-# desktop: 1920px szerokości
-ffmpeg -v error -i "$IN" -an -vf "fps=$FPS,scale=1920:-2:flags=lanczos" -c:v libwebp -quality 72 -compression_level 6 "$OUT/desktop/%04d.webp"
-# mobile: wycinek środka 9:16, 720px szerokości
-ffmpeg -v error -i "$IN" -an -vf "fps=$FPS,crop=ih*9/16:ih,scale=720:-2:flags=lanczos" -c:v libwebp -quality 70 -compression_level 6 "$OUT/mobile/%04d.webp"
+# desktop: 1600px szerokości
+ffmpeg -v error -i "$IN" -an -vf "fps=$FPS,scale=1600:-2:flags=lanczos" -c:v libwebp -quality 66 -compression_level 6 "$OUT/desktop/%04d.webp"
+# mobile: wycinek środka 9:16, 600px szerokości
+ffmpeg -v error -i "$IN" -an -vf "fps=$FPS,crop=ih*9/16:ih,scale=600:-2:flags=lanczos" -c:v libwebp -quality 64 -compression_level 6 "$OUT/mobile/%04d.webp"
 
 D=$(ls "$OUT/desktop" | wc -l | tr -d ' ')
 M=$(ls "$OUT/mobile" | wc -l | tr -d ' ')
